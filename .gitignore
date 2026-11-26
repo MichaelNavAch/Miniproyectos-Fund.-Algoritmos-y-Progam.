@@ -2,5 +2,3 @@ __pycache__/
 *.pyc
 .vscode/
 
-medallero.csv
-reporte_copa_loyola.csv

@@ -790,7 +790,9 @@ def mostrar_info(lineas):
 #Entradas: recibe una lista de líneas de texto.
 #Procedimiento: borra lo que había en la lista de la pestaña Consultas y escribe cada línea.
 #Salidas: muestra la información en pantalla.
-    pass
+    lst_consulta.delete(0, tk.END)
+    for linea in lineas:
+        lst_consulta.insert(tk.END, linea)
 
 
 
@@ -1073,42 +1075,130 @@ def crear_dataframe_resultados():
 #Entradas: usa los resultados por equipos, los resultados individuales, los deportistas, las universidades y las disciplinas.
 #Procedimiento: arma una fila por cada medalla con el nombre de la universidad, el de la disciplina y la medalla; en las medallas individuales la universidad es la del deportista que la ganó. Con esas filas crea un DataFrame.
 #Salidas: devuelve el DataFrame con las columnas Universidad, Disciplina y Medalla.
-    pass
+    filas = []
+    for fila in resultados:
+        filas.append([universidades[fila[1]]["nombre"], disciplinas[fila[0]]["nombre"], fila[2]])
+    for fila in resultados_ind:
+        id_uni = deportistas[fila[1]]["uni"]
+        filas.append([universidades[id_uni]["nombre"], disciplinas[fila[0]]["nombre"], fila[2]])
+    return pd.DataFrame(filas, columns=["Universidad", "Disciplina", "Medalla"])
 
 
 def calcular_reporte(df):
 #Entradas: recibe el DataFrame de resultados.
 #Procedimiento: con Pandas agrupa por universidad y medalla y cuenta cuántas hay de cada tipo, calcula los puntos (oro 3, plata 2, bronce 1) y ordena de mayor a menor por puntos, y en empate por oros, platas y bronces.
 #Salidas: devuelve un DataFrame con las columnas Universidad, Oro, Plata, Bronce y Puntos.
-    pass
+    conteo = df.groupby(["Universidad", "Medalla"]).size().unstack(fill_value=0)
+    for medalla in posiciones:
+        if medalla not in conteo.columns:
+            conteo[medalla] = 0
+    tabla = conteo[posiciones].reset_index()
+    tabla.columns.name = None
+    tabla["Puntos"] = (tabla["Oro"] * puntos["Oro"] + tabla["Plata"] * puntos["Plata"] +
+                       tabla["Bronce"] * puntos["Bronce"])
+    tabla = tabla.sort_values(by=["Puntos", "Oro", "Plata", "Bronce", "Universidad"],
+                              ascending=[False, False, False, False, True])
+    return tabla.reset_index(drop=True)
 
 
 def buscar_ganadoras(tabla):
 #Entradas: recibe el DataFrame del reporte ya ordenado.
 #Procedimiento: toma la primera fila y busca todas las universidades que tengan los mismos puntos, oros, platas y bronces que ella.
 #Salidas: devuelve la lista de universidades ganadoras (más de una si hay empate total).
-    pass
+    primera = tabla.iloc[0]
+    empatadas = tabla[(tabla["Puntos"] == primera["Puntos"]) & (tabla["Oro"] == primera["Oro"]) &
+                      (tabla["Plata"] == primera["Plata"]) & (tabla["Bronce"] == primera["Bronce"])]
+    return list(empatadas["Universidad"])
 
 
 def exportar_reporte_csv(tabla, avisar=True):
 #Entradas: recibe el DataFrame del reporte y si se debe mostrar un mensaje al terminar.
 #Procedimiento: exporta el DataFrame al archivo reporte_copa_loyola.csv con Pandas y, si ocurre un error, lo informa.
 #Salidas: devuelve verdadero si el archivo se creó y falso si hubo un error.
-    pass
+    try:
+        tabla.to_csv(ruta(ARCHIVO_REPORTE), index=False, encoding="utf-8-sig")
+    except OSError as e:
+        error("No se pudo exportar el archivo " + ARCHIVO_REPORTE + ":\n" + str(e))
+        return False
+    if avisar:
+        messagebox.showinfo("Reporte", "El reporte se exportó correctamente en " + ARCHIVO_REPORTE + ".")
+    return True
 
 
 def mostrar_ventana_reporte(tabla, ganadoras):
 #Entradas: recibe el DataFrame del reporte y la lista de universidades ganadoras.
 #Procedimiento: abre una ventana nueva (Toplevel) con una tabla de universidades, medallas y puntos, la universidad ganadora y botones para exportar a CSV y cerrar.
 #Salidas: muestra la ventana del reporte.
-    pass
+    ventana_rep = tk.Toplevel(ventana)
+    ventana_rep.title("Reporte con Pandas - Copa Loyola")
+    ventana_rep.geometry("620x400")
+    ttk.Label(ventana_rep, text="Reporte: resultados de la Copa Loyola",
+              font=("Arial", 13, "bold")).pack(anchor="w", padx=12, pady=(10, 0))
+    ttk.Label(ventana_rep, text="Agrupación: universidad").pack(anchor="w", padx=12)
+
+    columnas = ["Universidad", "Oro", "Plata", "Bronce", "Puntos"]
+    marco = ttk.Frame(ventana_rep)
+    marco.pack(fill="both", expand=True, padx=12, pady=8)
+    barra = ttk.Scrollbar(marco, orient="vertical")
+    arbol = ttk.Treeview(marco, columns=columnas, show="headings", yscrollcommand=barra.set)
+    barra.config(command=arbol.yview)
+    for col in columnas:
+        arbol.heading(col, text=col)
+        if col == "Universidad":
+            arbol.column(col, width=260, anchor="w")
+        else:
+            arbol.column(col, width=70, anchor="center")
+    for i in range(len(tabla)):
+        fila = tabla.iloc[i]
+        arbol.insert("", tk.END, values=[fila["Universidad"], int(fila["Oro"]), int(fila["Plata"]),
+                                         int(fila["Bronce"]), int(fila["Puntos"])])
+    barra.pack(side="right", fill="y")
+    arbol.pack(side="left", fill="both", expand=True)
+
+    if len(ganadoras) == 1:
+        texto = "Universidad ganadora: " + ganadoras[0]
+    else:
+        texto = "Empate total entre: " + ", ".join(ganadoras)
+    ttk.Label(ventana_rep, text=texto, font=("Arial", 11, "bold")).pack(anchor="w", padx=12)
+    fila_botones = ttk.Frame(ventana_rep)
+    fila_botones.pack(anchor="e", padx=12, pady=10)
+    ttk.Button(fila_botones, text="Exportar CSV",
+               command=lambda: exportar_reporte_csv(tabla)).pack(side="left", padx=3)
+    ttk.Button(fila_botones, text="Cerrar", command=ventana_rep.destroy).pack(side="left", padx=3)
 
 
 def generar_reporte():
 #Entradas: usa los resultados guardados en el programa.
 #Procedimiento: revisa que Pandas esté instalado y que haya resultados, crea el DataFrame de resultados, calcula el conteo de medallas y los puntos por universidad, busca la ganadora, exporta el reporte a CSV y lo muestra en una ventana nueva.
 #Salidas: crea reporte_copa_loyola.csv, abre la ventana del reporte y muestra en pantalla si salió bien o qué error ocurrió.
-    pass
+    if pd is None:
+        error("No se puede generar el reporte porque Pandas no está instalado.\n"
+              "Instálelo con: pip install pandas")
+        return
+    if len(resultados) + len(resultados_ind) == 0:
+        error("No hay resultados registrados para generar el reporte.")
+        return
+    try:
+        df = crear_dataframe_resultados()
+        tabla = calcular_reporte(df)
+        ganadoras = buscar_ganadoras(tabla)
+    except Exception as e:
+        error("Ocurrió un error al generar el reporte:\n" + str(e))
+        return
+    exportado = exportar_reporte_csv(tabla, False)
+    lineas = ["Reporte generado correctamente.", "Universidad | Oro | Plata | Bronce | Puntos"]
+    for i in range(len(tabla)):
+        fila = tabla.iloc[i]
+        lineas.append(fila["Universidad"] + " | " + str(fila["Oro"]) + " | " + str(fila["Plata"]) +
+                      " | " + str(fila["Bronce"]) + " | " + str(fila["Puntos"]))
+    lineas.append("Universidad ganadora: " + ", ".join(ganadoras))
+    if exportado:
+        lineas.append("Reporte exportado en: " + ARCHIVO_REPORTE)
+    mostrar_info(lineas)
+    mostrar_ventana_reporte(tabla, ganadoras)
+    if exportado:
+        messagebox.showinfo("Reporte", "El reporte se generó correctamente y se exportó en " +
+                            ARCHIVO_REPORTE + ".")
 
 
 
