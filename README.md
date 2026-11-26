@@ -6,8 +6,8 @@ Aplicación en Python con interfaz en Tkinter para gestionar la Copa Loyola: uni
 
 ## Integrantes
 
-- Sebastian Villota
-- Michael Navarrete
+- Johan Sebastian Villota Tarazona
+- Michael Navarrete Achicanoy
 
 ## Contenido
 
