@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.vscode/
+.idea/
+
+# Archivos que genera el programa al usarlo
+medallero.csv
+reporte_copa_loyola.csv
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*

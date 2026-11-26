@@ -1,0 +1,307 @@
+{
+    "universidades": {
+        "1": {
+            "nombre": "Pontificia Universidad Javeriana Cali",
+            "pais": "Colombia",
+            "ciudad": "Cali",
+            "tipo": "Nacional"
+        },
+        "2": {
+            "nombre": "Universidad de los Andes",
+            "pais": "Colombia",
+            "ciudad": "Bogotá",
+            "tipo": "Nacional"
+        },
+        "3": {
+            "nombre": "Universidad del Valle",
+            "pais": "Colombia",
+            "ciudad": "Cali",
+            "tipo": "Nacional"
+        },
+        "4": {
+            "nombre": "Universidad de Lima",
+            "pais": "Perú",
+            "ciudad": "Lima",
+            "tipo": "Internacional"
+        },
+        "5": {
+            "nombre": "Tecnológico de Monterrey",
+            "pais": "México",
+            "ciudad": "Monterrey",
+            "tipo": "Internacional"
+        },
+        "6": {
+            "nombre": "Universidad de Chile",
+            "pais": "Chile",
+            "ciudad": "Santiago",
+            "tipo": "Internacional"
+        }
+    },
+    "deportistas": {
+        "1": {
+            "nombre": "Laura Gómez",
+            "tipo_doc": "CC",
+            "numero": "1005123456",
+            "uni": 1
+        },
+        "2": {
+            "nombre": "Mateo Pérez",
+            "tipo_doc": "TI",
+            "numero": "1102334455",
+            "uni": 2
+        },
+        "3": {
+            "nombre": "Valentina Ríos",
+            "tipo_doc": "CC",
+            "numero": "1144556677",
+            "uni": 3
+        },
+        "4": {
+            "nombre": "Diego Quispe",
+            "tipo_doc": "Pasaporte",
+            "numero": "PE4455667",
+            "uni": 4
+        },
+        "5": {
+            "nombre": "Sofia Hernández",
+            "tipo_doc": "Pasaporte",
+            "numero": "MX9988776",
+            "uni": 5
+        },
+        "6": {
+            "nombre": "Tomas Muñoz",
+            "tipo_doc": "Pasaporte",
+            "numero": "CL1234567",
+            "uni": 6
+        },
+        "7": {
+            "nombre": "Camila Torres",
+            "tipo_doc": "CC",
+            "numero": "1005987654",
+            "uni": 1
+        },
+        "8": {
+            "nombre": "Juan Esteban Ospina",
+            "tipo_doc": "CC",
+            "numero": "1020304050",
+            "uni": 2
+        },
+        "9": {
+            "nombre": "Andres Castillo",
+            "tipo_doc": "CC",
+            "numero": "1144000111",
+            "uni": 3
+        },
+        "10": {
+            "nombre": "Lucia Flores",
+            "tipo_doc": "Pasaporte",
+            "numero": "PE1112223",
+            "uni": 4
+        },
+        "11": {
+            "nombre": "Santiago López",
+            "tipo_doc": "CC",
+            "numero": "1006111222",
+            "uni": 1
+        },
+        "12": {
+            "nombre": "Mariana Vega",
+            "tipo_doc": "Pasaporte",
+            "numero": "MX5554443",
+            "uni": 5
+        }
+    },
+    "disciplinas": {
+        "1": {
+            "nombre": "Fútbol",
+            "modalidad": "Por equipos"
+        },
+        "2": {
+            "nombre": "Baloncesto",
+            "modalidad": "Por equipos"
+        },
+        "3": {
+            "nombre": "Voleibol",
+            "modalidad": "Por equipos"
+        },
+        "4": {
+            "nombre": "Natación 100 m libre",
+            "modalidad": "Individual"
+        },
+        "5": {
+            "nombre": "Atletismo 400 m",
+            "modalidad": "Individual"
+        },
+        "6": {
+            "nombre": "Ajedrez",
+            "modalidad": "Individual"
+        }
+    },
+    "inscripciones": [
+        [
+            1,
+            4
+        ],
+        [
+            3,
+            4
+        ],
+        [
+            5,
+            4
+        ],
+        [
+            10,
+            4
+        ],
+        [
+            2,
+            5
+        ],
+        [
+            4,
+            5
+        ],
+        [
+            6,
+            5
+        ],
+        [
+            11,
+            5
+        ],
+        [
+            7,
+            6
+        ],
+        [
+            8,
+            6
+        ],
+        [
+            9,
+            6
+        ],
+        [
+            12,
+            6
+        ],
+        [
+            1,
+            1
+        ],
+        [
+            2,
+            1
+        ],
+        [
+            3,
+            1
+        ],
+        [
+            4,
+            1
+        ],
+        [
+            5,
+            1
+        ],
+        [
+            6,
+            1
+        ],
+        [
+            7,
+            2
+        ],
+        [
+            8,
+            2
+        ],
+        [
+            9,
+            2
+        ],
+        [
+            10,
+            2
+        ],
+        [
+            11,
+            3
+        ],
+        [
+            12,
+            3
+        ]
+    ],
+    "resultados": [
+        [
+            1,
+            1,
+            "Oro"
+        ],
+        [
+            1,
+            4,
+            "Plata"
+        ],
+        [
+            1,
+            2,
+            "Bronce"
+        ],
+        [
+            2,
+            1,
+            "Oro"
+        ],
+        [
+            2,
+            5,
+            "Plata"
+        ],
+        [
+            2,
+            3,
+            "Bronce"
+        ],
+        [
+            3,
+            4,
+            "Oro"
+        ],
+        [
+            3,
+            1,
+            "Plata"
+        ],
+        [
+            3,
+            6,
+            "Bronce"
+        ]
+    ],
+    "resultados_ind": [
+        [
+            4,
+            5,
+            "Oro"
+        ],
+        [
+            4,
+            1,
+            "Plata"
+        ],
+        [
+            5,
+            6,
+            "Oro"
+        ],
+        [
+            6,
+            7,
+            "Oro"
+        ]
+    ]
+}
