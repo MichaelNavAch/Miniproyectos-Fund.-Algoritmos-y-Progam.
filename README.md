@@ -1,37 +1,47 @@
-# Mini proyecto 2 — Copa Loyola
+# Copa Loyola — Mini proyectos de programación
 
 Fundamentos de Algoritmos y Programación · Pontificia Universidad Javeriana
 
-Aplicación en Tkinter para gestionar la Copa Loyola: universidades, deportistas, disciplinas, inscripciones y resultados. El Mini proyecto 2 agrega:
+Aplicación en Python + Tkinter para gestionar la Copa Loyola, un evento deportivo entre universidades nacionales e internacionales.
 
-- **Archivos:** guardar y cargar toda la información en `copa_loyola_datos.json` (módulo `json`) y exportar `medallero.csv`.
-- **Conjuntos (sets):** detectar universidades, disciplinas, deportistas e inscripciones repetidas antes de guardar.
-- **Pandas:** reporte de medallas y puntos por universidad (Oro = 3, Plata = 2, Bronce = 1), con ventana `Toplevel` y exportación a `reporte_copa_loyola.csv`.
-
-## Cómo ejecutarlo
-
-```bash
-py -m pip install -r requirements.txt
-py MiniProyectoCopa2.py
-```
-
-En la pestaña **Consultas / Archivos / Reportes** presione **Cargar datos (JSON)** para cargar los datos de ejemplo de `copa_loyola_datos.json`.
+| Carpeta | Contenido |
+|---|---|
+| [`mini-proyecto-1/`](mini-proyecto-1) | Primera entrega: gestión de universidades, deportistas, disciplinas, inscripciones, resultados, medallero y estadísticas. |
+| [`mini-proyecto-2/`](mini-proyecto-2) | Segunda entrega: lo anterior + guardar/cargar en JSON, medallero en CSV, detección de repetidos con conjuntos y reporte con Pandas. |
 
 ## Estructura
 
 ```
-MiniProyectoCopa2.py      programa completo (interfaz + funciones)
-copa_loyola_datos.json    datos de ejemplo
-requirements.txt          dependencias (pandas)
-diagramas/                diagramas de flujo de las funciones nuevas
-  Diagramas_Mini_Proyecto_2.drawio   editable en app.diagrams.net (una página por función)
-  48_...png … 68_...png              un PNG por función
-  Diagramas de Flujo-Mini Proyecto 2.pdf
+mini-proyecto-1/
+├── MiniProyectoCopa1.py          programa
+├── diagramas/                    diagramas de flujo (25–47) + PDF
+└── enunciado/                    enunciado del profesor
+
+mini-proyecto-2/
+├── MiniProyectoCopa2.py          programa
+├── copa_loyola_datos.json        datos de ejemplo
+├── diagramas/                    diagramas de flujo (48–68): .drawio editable, PNG y PDF
+└── enunciado/                    enunciado del profesor
+
+requirements.txt                  dependencias (pandas)
 ```
 
-## Reparto de funciones
+## Cómo ejecutar
 
-Las funciones nuevas están en `MiniProyectoCopa2.py` marcadas con `# PENDIENTE (Parte A)` o `# PENDIENTE (Parte B)`. Cada una ya tiene su comentario de Entradas / Procedimiento / Salidas; solo falta el cuerpo. Mientras estén pendientes, el botón correspondiente muestra "Función pendiente".
+```bash
+py -m pip install -r requirements.txt
+
+py mini-proyecto-1/MiniProyectoCopa1.py
+py mini-proyecto-2/MiniProyectoCopa2.py
+```
+
+En el Mini proyecto 2, en la pestaña **Consultas / Archivos / Reportes**, el botón **Cargar datos (JSON)** carga los datos de ejemplo.
+
+Los diagramas del Mini proyecto 2 se pueden abrir y editar en [app.diagrams.net](https://app.diagrams.net) con `mini-proyecto-2/diagramas/Diagramas_Mini_Proyecto_2.drawio`.
+
+## Mini proyecto 2: reparto de funciones
+
+Las funciones nuevas están en `mini-proyecto-2/MiniProyectoCopa2.py` marcadas con `# PENDIENTE (Parte A)` o `# PENDIENTE (Parte B)`. Cada una ya tiene su comentario de Entradas / Procedimiento / Salidas. Mientras estén pendientes, el botón correspondiente muestra "Función pendiente".
 
 | Parte A — Archivos y conjuntos | Parte B — Pandas y consultas |
 |---|---|
@@ -54,13 +64,12 @@ Las funciones nuevas están en `MiniProyectoCopa2.py` marcadas con `# PENDIENTE 
 Cada parte tiene su rama: `parte-a` y `parte-b`.
 
 ```bash
-git clone <url-del-repositorio>
-cd Miniproyecto-programaci-n
-git switch parte-a          # o parte-b
-# ... completar las funciones ...
-git add MiniProyectoCopa2.py
-git commit -m "Parte A: guardar y cargar datos en JSON"
+git switch parte-b                  # (o parte-a)
+git pull
+# ... completar las funciones en mini-proyecto-2/MiniProyectoCopa2.py ...
+git add mini-proyecto-2/MiniProyectoCopa2.py
+git commit -m "Parte B: reporte con Pandas y consultas"
 git push
 ```
 
-Cuando una parte esté lista, se abre un **Pull Request** de `parte-a` (o `parte-b`) hacia `main` en GitHub y se hace merge. Como cada uno edita funciones distintas, los dos merges deberían entrar sin conflictos. Antes de empezar a trabajar cada día: `git pull`.
+Luego en GitHub: **Pull requests → New pull request**, base `main` ← compare `parte-b`, **Create pull request** y **Merge pull request**. Como cada parte edita funciones distintas, los dos merges entran sin conflictos.
