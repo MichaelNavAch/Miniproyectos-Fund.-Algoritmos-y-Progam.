@@ -800,28 +800,107 @@ def ruta(nombre_archivo):
 #Entradas: recibe el nombre de un archivo.
 #Procedimiento: le pega adelante la carpeta donde está guardado el programa.
 #Salidas: devuelve la ruta completa del archivo.
-    pass
+    return os.path.join(CARPETA, nombre_archivo)
 
 
 def datos_a_json():
 #Entradas: usa las universidades, deportistas, disciplinas, inscripciones y resultados guardados.
 #Procedimiento: arma un solo diccionario con toda la información; como JSON solo acepta textos como llaves, los identificadores de los diccionarios se pasan a texto.
 #Salidas: devuelve el diccionario listo para escribirlo en el archivo JSON.
-    pass
+    datos = {"universidades": {}, "deportistas": {}, "disciplinas": {},
+             "inscripciones": [], "resultados": [], "resultados_ind": []}
+    for id_, u in universidades.items():
+        datos["universidades"][str(id_)] = u
+    for id_, d in deportistas.items():
+        datos["deportistas"][str(id_)] = d
+    for id_, d in disciplinas.items():
+        datos["disciplinas"][str(id_)] = d
+    for fila in inscripciones:
+        datos["inscripciones"].append(list(fila))
+    for fila in resultados:
+        datos["resultados"].append(list(fila))
+    for fila in resultados_ind:
+        datos["resultados_ind"].append(list(fila))
+    return datos
 
 
 def es_texto(valor):
 #Entradas: recibe cualquier valor.
 #Procedimiento: revisa si el valor es un texto que no esté vacío.
 #Salidas: devuelve verdadero si es un texto con contenido y falso si no.
-    pass
+    return isinstance(valor, str) and valor.strip() != ""
 
 
 def validar_estructura(datos):
 #Entradas: recibe el diccionario con toda la información (con llaves en texto, como queda en el JSON).
 #Procedimiento: revisa que estén las cinco secciones obligatorias (si falta la de resultados individuales la crea vacía), que cada registro tenga sus campos con valores permitidos y que las inscripciones y resultados apunten a universidades, deportistas y disciplinas que sí existen.
 #Salidas: devuelve un texto vacío si todo está bien, o un texto explicando el primer problema encontrado.
-    pass
+    if not isinstance(datos, dict):
+        return "El archivo no contiene un diccionario con los datos."
+    for seccion in ["universidades", "deportistas", "disciplinas", "inscripciones", "resultados"]:
+        if seccion not in datos:
+            return "Falta la sección '" + seccion + "'."
+    if "resultados_ind" not in datos:
+        datos["resultados_ind"] = []
+    for seccion in ["universidades", "deportistas", "disciplinas"]:
+        if not isinstance(datos[seccion], dict):
+            return "La sección '" + seccion + "' debe ser un diccionario."
+        for id_ in datos[seccion]:
+            if not id_.isdigit():
+                return "El identificador '" + id_ + "' de " + seccion + " no es un número."
+    for seccion in ["inscripciones", "resultados", "resultados_ind"]:
+        if not isinstance(datos[seccion], list):
+            return "La sección '" + seccion + "' debe ser una lista."
+
+    for id_, u in datos["universidades"].items():
+        if not isinstance(u, dict):
+            return "La universidad " + id_ + " no tiene un formato válido."
+        for campo in ["nombre", "pais", "ciudad"]:
+            if not es_texto(u.get(campo)):
+                return "La universidad " + id_ + " no tiene un " + campo + " válido."
+        if u.get("tipo") not in Tipoparticipacion:
+            return "La universidad " + id_ + " tiene un tipo de participación inválido."
+
+    for id_, d in datos["deportistas"].items():
+        if not isinstance(d, dict):
+            return "El deportista " + id_ + " no tiene un formato válido."
+        if not es_texto(d.get("nombre")) or not es_texto(d.get("numero")):
+            return "El deportista " + id_ + " no tiene nombre o número de documento válido."
+        if d.get("tipo_doc") not in TipoDoc:
+            return "El deportista " + id_ + " tiene un tipo de documento inválido."
+        if str(d.get("uni")) not in datos["universidades"]:
+            return "El deportista " + id_ + " pertenece a una universidad que no existe."
+
+    for id_, d in datos["disciplinas"].items():
+        if not isinstance(d, dict):
+            return "La disciplina " + id_ + " no tiene un formato válido."
+        if not es_texto(d.get("nombre")):
+            return "La disciplina " + id_ + " no tiene un nombre válido."
+        if d.get("modalidad") not in modalidades:
+            return "La disciplina " + id_ + " tiene una modalidad inválida."
+
+    for fila in datos["inscripciones"]:
+        if not isinstance(fila, list) or len(fila) != 2:
+            return "Hay una inscripción con formato inválido."
+        if str(fila[0]) not in datos["deportistas"] or str(fila[1]) not in datos["disciplinas"]:
+            return "Hay una inscripción con un deportista o una disciplina que no existe."
+
+    for fila in datos["resultados"]:
+        if not isinstance(fila, list) or len(fila) != 3:
+            return "Hay un resultado por equipos con formato inválido."
+        if str(fila[0]) not in datos["disciplinas"] or str(fila[1]) not in datos["universidades"]:
+            return "Hay un resultado por equipos con una disciplina o universidad que no existe."
+        if fila[2] not in posiciones:
+            return "Hay un resultado por equipos con una medalla inválida."
+
+    for fila in datos["resultados_ind"]:
+        if not isinstance(fila, list) or len(fila) != 3:
+            return "Hay un resultado individual con formato inválido."
+        if str(fila[0]) not in datos["disciplinas"] or str(fila[1]) not in datos["deportistas"]:
+            return "Hay un resultado individual con una disciplina o deportista que no existe."
+        if fila[2] not in posiciones:
+            return "Hay un resultado individual con una medalla inválida."
+    return ""
 
 
 #CONJUNTOS (SETS) PARA DETECTAR DUPLICADOS
@@ -830,49 +909,162 @@ def detectar_duplicados(datos):
 #Entradas: recibe el diccionario con toda la información (como queda en el JSON).
 #Procedimiento: recorre universidades, disciplinas y deportistas guardando en un conjunto (set) el dato que identifica a cada uno (nombre de la universidad, nombre de la disciplina y tipo + número de documento del deportista); si un dato ya estaba en el conjunto, es un repetido. También revisa inscripciones repetidas.
 #Salidas: devuelve una lista de líneas con los datos repetidos (vacía si no hay ninguno).
-    pass
+    set_universidades = set()
+    set_disciplinas = set()
+    set_deportistas = set()
+    set_inscripciones = set()
+    repetidos = []
+
+    for u in datos["universidades"].values():
+        clave = u["nombre"].strip().lower()
+        if clave in set_universidades:
+            repetidos.append("Universidad: " + u["nombre"])
+        set_universidades.add(clave)
+
+    for d in datos["disciplinas"].values():
+        clave = d["nombre"].strip().lower()
+        if clave in set_disciplinas:
+            repetidos.append("Disciplina: " + d["nombre"])
+        set_disciplinas.add(clave)
+
+    for d in datos["deportistas"].values():
+        clave = d["tipo_doc"] + " " + d["numero"].strip().lower()
+        if clave in set_deportistas:
+            repetidos.append("Deportista: " + d["nombre"] + " (" + d["tipo_doc"] + " " + d["numero"] + ")")
+        set_deportistas.add(clave)
+
+    for fila in datos["inscripciones"]:
+        clave = (fila[0], fila[1])
+        if clave in set_inscripciones:
+            dep = datos["deportistas"][str(fila[0])]["nombre"]
+            dis = datos["disciplinas"][str(fila[1])]["nombre"]
+            repetidos.append("Inscripción: " + dep + " en " + dis)
+        set_inscripciones.add(clave)
+    return repetidos
 
 
 def avisar_duplicados(repetidos):
 #Entradas: recibe la lista de datos repetidos.
 #Procedimiento: si la lista tiene algo, arma un mensaje con cada repetido y lo muestra como advertencia.
 #Salidas: devuelve verdadero si mostró la advertencia y falso si no había repetidos.
-    pass
+    if len(repetidos) == 0:
+        return False
+    messagebox.showwarning("Registros repetidos",
+                           "Se encontraron los siguientes datos repetidos:\n\n- " +
+                           "\n- ".join(repetidos))
+    return True
 
 
 def resumen_datos():
 #Entradas: usa los datos guardados en el programa.
 #Procedimiento: cuenta cuántos registros hay de cada tipo.
 #Salidas: devuelve una lista de líneas con las cantidades.
-    pass
+    return ["Universidades: " + str(len(universidades)) + " | Deportistas: " + str(len(deportistas)),
+            "Disciplinas: " + str(len(disciplinas)) + " | Inscripciones: " + str(len(inscripciones)),
+            "Resultados por equipos: " + str(len(resultados)) +
+            " | Resultados individuales: " + str(len(resultados_ind))]
 
 
 def guardar_datos():
 #Entradas: usa toda la información guardada en el programa.
 #Procedimiento: arma el diccionario para el JSON, revisa que su estructura sea válida, busca repetidos con conjuntos (y si hay, avisa y pregunta si se quiere guardar igual), escribe el archivo copa_loyola_datos.json con el módulo json y luego genera automáticamente medallero.csv.
 #Salidas: crea o reemplaza los archivos y muestra en pantalla si todo salió bien o qué error ocurrió.
-    pass
+    datos = datos_a_json()
+    problema = validar_estructura(datos)
+    if problema != "":
+        error("No se guardaron los datos porque la estructura no es válida:\n" + problema)
+        return
+    if avisar_duplicados(detectar_duplicados(datos)):
+        if not messagebox.askyesno("Confirmar", "¿Desea guardar los datos de todas formas?"):
+            return
+    try:
+        with open(ruta(ARCHIVO_JSON), "w", encoding="utf-8") as archivo:
+            json.dump(datos, archivo, ensure_ascii=False, indent=4)
+    except OSError as e:
+        error("No se pudo guardar el archivo " + ARCHIVO_JSON + ":\n" + str(e))
+        return
+    lineas = ["Datos guardados correctamente.", "Archivo: " + ARCHIVO_JSON] + resumen_datos()
+    if generar_medallero_csv(False):
+        lineas.append("Medallero exportado en: " + ARCHIVO_MEDALLERO)
+    mostrar_info(lineas)
+    messagebox.showinfo("Guardar datos", "Los datos se guardaron correctamente en " + ARCHIVO_JSON +
+                        " y el medallero en " + ARCHIVO_MEDALLERO + ".")
 
 
 def reemplazar_datos(datos):
 #Entradas: recibe el diccionario leído del JSON, ya validado.
 #Procedimiento: borra la información actual del programa y la llena con la del archivo, pasando los identificadores de texto otra vez a números.
 #Salidas: deja las estructuras del programa reconstruidas.
-    pass
+    universidades.clear()
+    deportistas.clear()
+    disciplinas.clear()
+    for id_, u in datos["universidades"].items():
+        universidades[int(id_)] = {"nombre": u["nombre"], "pais": u["pais"],
+                                   "ciudad": u["ciudad"], "tipo": u["tipo"]}
+    for id_, d in datos["deportistas"].items():
+        deportistas[int(id_)] = {"nombre": d["nombre"], "tipo_doc": d["tipo_doc"],
+                                 "numero": d["numero"], "uni": int(d["uni"])}
+    for id_, d in datos["disciplinas"].items():
+        disciplinas[int(id_)] = {"nombre": d["nombre"], "modalidad": d["modalidad"]}
+    inscripciones.clear()
+    for fila in datos["inscripciones"]:
+        inscripciones.append([int(fila[0]), int(fila[1])])
+    resultados.clear()
+    for fila in datos["resultados"]:
+        resultados.append([int(fila[0]), int(fila[1]), fila[2]])
+    resultados_ind.clear()
+    for fila in datos["resultados_ind"]:
+        resultados_ind.append([int(fila[0]), int(fila[1]), fila[2]])
 
 
 def cargar_datos():
 #Entradas: usa el archivo copa_loyola_datos.json.
 #Procedimiento: revisa que el archivo exista, lo lee con el módulo json (manejando el error si está dañado o no se puede leer), valida su estructura, avisa si tiene repetidos, reconstruye los datos del programa y actualiza la pantalla.
 #Salidas: carga la información en el programa y muestra si todo salió bien o qué error ocurrió.
-    pass
+    if not os.path.exists(ruta(ARCHIVO_JSON)):
+        error("No existe el archivo " + ARCHIVO_JSON + ". Primero guarde los datos.")
+        return
+    try:
+        with open(ruta(ARCHIVO_JSON), "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+    except json.JSONDecodeError:
+        error("El archivo " + ARCHIVO_JSON + " tiene un formato JSON inválido.")
+        return
+    except (OSError, UnicodeDecodeError) as e:
+        error("No se pudo leer el archivo " + ARCHIVO_JSON + ":\n" + str(e))
+        return
+    problema = validar_estructura(datos)
+    if problema != "":
+        error("No se cargaron los datos porque la estructura del archivo no es válida:\n" + problema)
+        return
+    avisar_duplicados(detectar_duplicados(datos))
+    if messagebox.askyesno("Confirmar", "Se reemplazará la información actual por la del archivo. ¿Continuar?"):
+        reemplazar_datos(datos)
+        refrescar()
+        mostrar_info(["Datos cargados correctamente.", "Archivo: " + ARCHIVO_JSON] + resumen_datos())
+        messagebox.showinfo("Cargar datos", "Los datos se cargaron correctamente.")
 
 
 def generar_medallero_csv(avisar=True):
 #Entradas: recibe si se debe mostrar un mensaje al terminar y usa el medallero calculado.
 #Procedimiento: escribe el archivo medallero.csv con el módulo csv, con una fila por universidad con sus oros, platas, bronces, total de medallas y puntos; si ocurre un error lo informa.
 #Salidas: devuelve verdadero si el archivo se creó y falso si hubo un error.
-    pass
+    try:
+        with open(ruta(ARCHIVO_MEDALLERO), "w", newline="", encoding="utf-8-sig") as archivo:
+            escritor = csv.writer(archivo)
+            escritor.writerow(["Universidad", "Oro", "Plata", "Bronce", "Total", "Puntos"])
+            for id_, m in calcular_medallero().items():
+                total = m["Oro"] + m["Plata"] + m["Bronce"]
+                pts = m["Oro"] * puntos["Oro"] + m["Plata"] * puntos["Plata"] + m["Bronce"] * puntos["Bronce"]
+                escritor.writerow([universidades[id_]["nombre"], m["Oro"], m["Plata"], m["Bronce"], total, pts])
+    except OSError as e:
+        error("No se pudo generar el archivo " + ARCHIVO_MEDALLERO + ":\n" + str(e))
+        return False
+    if avisar:
+        mostrar_info(["Medallero exportado correctamente.", "Archivo: " + ARCHIVO_MEDALLERO] +
+                     consulta_medallero())
+        messagebox.showinfo("Medallero", "El medallero se exportó correctamente en " + ARCHIVO_MEDALLERO + ".")
+    return True
 
 
 # MINI PROYECTO 2: REPORTES CON PANDAS
