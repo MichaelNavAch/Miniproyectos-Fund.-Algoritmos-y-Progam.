@@ -21,6 +21,7 @@ Aplicación en Python con interfaz en Tkinter para gestionar la Copa Loyola: uni
 - `Codigo/copa_loyola_datos.json`: datos de ejemplo.
 - `Codigo/medallero.csv` y `Codigo/reporte_copa_loyola.csv`: archivos generados durante las pruebas.
 - `Diagramas_Flujo/`: diagramas de flujo de las funciones nuevas (el archivo `.drawio` se abre en app.diagrams.net).
+- `Documento_Diseño_Mini_Proyecto_2.docx`: documento de diseño con las entradas, salidas, procedimiento y diagrama de flujo de cada función nueva o modificada.
 - `Mini_Proyecto_2_Copa_Loyola.pdf`: enunciado.
 
 ## Distribución del trabajo (Mini Proyecto 2)
